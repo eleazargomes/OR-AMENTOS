@@ -1,0 +1,20 @@
+<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Orçamentos</title>
+<link rel="stylesheet" href="css/style.css"><script src="js/config.js"></script><script src="js/app.js"></script></head>
+<body><main><div class="ph"><h1>Orçamentos</h1><a class="btn az" id="nv" href="novo-orcamento.html">+ Novo Orçamento</a></div>
+<div class="card"><h2>Filtrar Resultados</h2><div class="grid">
+<div><label>Setor</label><select id="fs"></select></div><div><label>Veículo</label><select id="fv"></select></div>
+<div><label>Status</label><select id="ft"><option value="">Todos os Status</option><option>Aprovado</option><option>Pendente</option><option>Rejeitado</option></select></div>
+<button class="btn cz" onclick="fs.value=fv.value=ft.value='';draw()">Limpar</button></div></div>
+<div class="tc"><table><thead><tr><th>Nº</th><th>Setor</th><th>Veículo</th><th>Valor Total</th><th>Status</th><th>Ações</th></tr></thead><tbody id="tb"></tbody></table></div></main>
+<script>
+let L=[];
+function draw(){tb.innerHTML=L.filter(o=>(!fs.value||o.setor===fs.value)&&(!fv.value||o.veiculo===fv.value)&&(!ft.value||o.status===ft.value)).map(o=>`<tr>
+<td>#${esc(o.id)}</td><td>${esc(o.setor)}</td><td>${esc(o.veiculo)}</td><td>${brl(o.total)}${o.pend?`<br><span class="badge b-pendente">${o.pend} sem cotação</span>`:''}</td><td>${badge(o.status)}</td>
+<td>${can('dimensionar')?`<a class="btn sm az" href="orcamento-dimensionar.html?id=${o.id}">Dimensionar</a> `:''}${o.pend&&can('suprimentos')?`<a class="btn sm" href="suprimentos-cotacao.html?id=${o.id}">Cotar</a> `:''}
+${o.status==='Pendente'&&!o.pend?`<button class="btn sm vd" onclick="st('${o.id}','Aprovado')">Aprovar</button> <button class="btn sm vm" onclick="st('${o.id}','Rejeitado')">Rejeitar</button>`:''}</td></tr>`).join('')||'<tr><td colspan="6" class="muted">Nenhum orçamento.</td></tr>'}
+const st=(id,s)=>run(async()=>{await api('atualizarStatus',{id,status:s});await load()});
+const load=async()=>{L=await api('listarOrcamentos');draw()};
+run(async()=>{if(!init('orcamentos'))return;if(!can('novo'))nv.style.display='none';
+fs.innerHTML=opts(SETORES,'Todos os Setores');fv.innerHTML=opts(VEICULOS,'Todos os Veículos');
+[fs,fv,ft].forEach(e=>e.onchange=draw);await load()})
+</script></body></html>

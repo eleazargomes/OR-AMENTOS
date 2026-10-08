@@ -1,0 +1,16 @@
+<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cotação de Suprimentos</title><link rel="stylesheet" href="css/style.css"><script src="js/config.js"></script><script src="js/app.js"></script></head><body><main><div class="ph"><h1 id="h">Cotação de Suprimentos</h1><a href="orcamentos.html">&larr; Voltar para a lista</a></div>
+<div id="v"></div></main>
+<script>
+let P=[];
+function calc(){let t=0;document.querySelectorAll('[data-i]').forEach(r=>{const u=+r.querySelector('input').value||0,s=u*(+r.dataset.q);r.querySelector('.s').textContent=brl(s);t+=s});tt.textContent=brl(t)}
+const save=()=>run(async()=>{const c=[...document.querySelectorAll('[data-i]')].map(r=>({id:r.dataset.i,unitario:+r.querySelector('input').value}));
+if(c.some(x=>!(x.unitario>0)))return alert('Informe a cotação de todos os itens.');await api('salvarCotacao',{id:qs('id'),cotacoes:c});alert('Cotação enviada!');location.href='orcamentos.html'});
+run(async()=>{if(!init('suprimentos'))return;const id=qs('id');
+if(!id){const l=(await api('listarOrcamentos')).filter(o=>o.pend>0);v.innerHTML='<div class="tc"><table><thead><tr><th>Nº</th><th>Veículo</th><th>Itens pendentes</th><th></th></tr></thead><tbody>'+
+(l.map(o=>`<tr><td>#${esc(o.id)}</td><td>${esc(o.veiculo)}</td><td>${o.pend}</td><td><a class="btn sm az" href="?id=${o.id}">Cotar</a></td></tr>`).join('')||'<tr><td colspan="4" class="muted">Nada pendente.</td></tr>')+'</tbody></table></div>';return}
+const r=await api('getOrcamento',{id});P=r.itens.filter(x=>!x.cotado);h.textContent='Cotar Materiais Sem Cadastro - #'+id;
+v.innerHTML=`<div class="card info"><div><small>Veículo</small>${esc(r.orcamento.veiculo)}</div><div><small>Setor</small>${esc(r.orcamento.setor)}</div><div><small>Solicitante</small>${esc(r.orcamento.solicitante)}</div></div>
+<div class="tc"><table><thead><tr><th>Item</th><th>Qtd</th><th>Cotação Unit. (R$)</th><th>Subtotal</th></tr></thead><tbody>${P.map(x=>`<tr data-i="${x.id}" data-q="${x.qtd}"><td>${esc(x.descricao)}</td><td>${x.qtd}</td>
+<td><input type="number" step="0.01" min="0" placeholder="0,00" oninput="calc()"></td><td class="s">R$ 0,00</td></tr>`).join('')||'<tr><td colspan="4" class="muted">Sem itens pendentes.</td></tr>'}</tbody></table></div>
+<div class="total">Total cotado: <b id="tt">R$ 0,00</b></div><div class="acts"><a class="btn cz" href="orcamentos.html">Cancelar</a><button class="btn" onclick="save()">Confirmar & Enviar Cotação</button></div>`})
+</script></body></html>

@@ -1,0 +1,17 @@
+<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Usuários</title><link rel="stylesheet" href="css/style.css"><script src="js/config.js"></script><script src="js/app.js"></script></head><body><main><div class="ph"><h1>Gestão de Usuários</h1></div>
+<form class="card" id="f"><h2>Cadastrar usuário</h2><div class="grid">
+<div><label>Nome</label><input id="n" required></div><div><label>Login</label><input id="l" required></div>
+<div><label>Senha</label><input id="p" type="password" required minlength="6"></div><div><label>Setor</label><select id="s"></select></div>
+<div><label>Papel</label><select id="r"><option value="usuario">Usuário</option><option value="admin">Administrador</option></select></div></div>
+<label style="margin-top:1rem">Permissões de acesso</label><div class="chk" id="pc"></div><div class="acts"><button class="btn">+ Cadastrar</button></div></form>
+<div class="tc"><table><thead><tr><th>Nome / Login</th><th>Setor</th><th>Papel</th><th>Permissões</th><th></th></tr></thead><tbody id="tb"></tbody></table></div></main>
+<script>
+const chk=(n,sel)=>Object.keys(PAGES).filter(k=>k!=='usuarios').map(k=>`<label><input type="checkbox" name="${n}" value="${k}" ${(sel||[]).includes(k)?'checked':''}>${PAGES[k][1]}</label>`).join('');
+const get=n=>[...document.querySelectorAll(`[name="${n}"]:checked`)].map(x=>x.value);
+async function load(){const l=await api('listarUsuarios');tb.innerHTML=l.map(u=>`<tr><td><b>${esc(u.nome)}</b><br><span class="muted">${esc(u.login)}</span></td><td>${esc(u.setor)}</td>
+<td><select id="r_${u.id}"><option value="usuario" ${u.papel==='usuario'?'selected':''}>Usuário</option><option value="admin" ${u.papel==='admin'?'selected':''}>Administrador</option></select></td>
+<td><div class="chk">${chk('p_'+u.id,u.permissoes)}</div></td><td><button class="btn sm vd" onclick="up('${u.id}')">Salvar</button></td></tr>`).join('')}
+const up=id=>run(async()=>{await api('atualizarPermissoes',{id,papel:document.getElementById('r_'+id).value,permissoes:get('p_'+id)});alert('Permissões atualizadas.')});
+f.onsubmit=e=>{e.preventDefault();run(async()=>{await api('cadastrarUsuario',{nome:n.value,login:l.value,senha:p.value,setor:s.value,papel:r.value,permissoes:get('np')});f.reset();await load()})};
+run(async()=>{if(!init('usuarios'))return;s.innerHTML=opts(SETORES);pc.innerHTML=chk('np');await load()});
+</script></body></html>

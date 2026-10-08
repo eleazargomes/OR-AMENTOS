@@ -1,0 +1,11 @@
+<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Novo Orçamento</title>
+<link rel="stylesheet" href="css/style.css"><script src="js/config.js"></script><script src="js/app.js"></script></head>
+<body><main style="max-width:800px"><div class="ph"><h1>Novo Orçamento</h1><a href="orcamentos.html">&larr; Voltar para a lista</a></div>
+<form class="card" id="f"><div class="fg"><label>Veículo *</label><select id="v" required></select></div>
+<div class="fg"><label>Setor Solicitante *</label><select id="s" required></select></div>
+<div class="fg"><label>Descrição da Avaria / Problema *</label><textarea id="d" required placeholder="Descreva detalhadamente a avaria do veículo..."></textarea></div>
+<div class="acts"><a class="btn cz" href="orcamentos.html">Cancelar</a><button class="btn">Salvar Orçamento</button></div></form></main>
+<script>
+run(async()=>{if(!init('novo'))return;v.innerHTML=opts(VEICULOS,'Selecione um veículo...');s.innerHTML=opts(SETORES,'Selecione o setor...');s.value=sess().setor||''});
+f.onsubmit=e=>{e.preventDefault();run(async()=>{const r=await api('salvarOrcamento',{veiculo:v.value,setor:s.value,descricao:d.value});alert('Orçamento #'+r.id+' criado.');location.href='orcamento-dimensionar.html?id='+r.id})};
+</script></body></html>

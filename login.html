@@ -1,0 +1,12 @@
+<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Login</title>
+<link rel="stylesheet" href="css/style.css"><script src="js/config.js"></script><script src="js/app.js"></script></head>
+<body><div class="login"><div class="card"><h2>Entrar na Conta</h2>
+<form id="f"><div class="fg"><label>Usuário</label><input id="u" required placeholder="Digite seu usuário"></div>
+<div class="fg"><label>Senha</label><input id="p" type="password" required placeholder="Digite sua senha"></div>
+<button class="btn" style="width:100%" id="b">Entrar</button></form></div></div>
+<script>
+if(sess())location.href='index.html';
+f.onsubmit=e=>{e.preventDefault();b.disabled=true;b.textContent='Entrando...';
+api('login',{login:u.value,senha:p.value}).then(d=>{localStorage.setItem('sess',JSON.stringify(d));location.href='index.html'})
+.catch(x=>alert(x.message)).finally(()=>{b.disabled=false;b.textContent='Entrar'})};
+</script></body></html>
